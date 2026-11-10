@@ -105,5 +105,84 @@ public:
     FileException(const string& msg = "File error");
 };
 
+//  MODULE 1 : STRUCTS
+//  A struct is a small box that groups related data together.
+//  (Structs are used to improve code reusability: one definition, used
+//   by many classes.)
+// 
+
+struct Tile {
+    char tileLetter;     
+    bool filled;         
+
+    Tile();                                  
+    Tile(char letter, bool isFilled);       
+    bool operator==(const Tile& other) const;   
+
+  
+    friend ostream& operator<<(ostream& out, const Tile& t);
+    friend istream& operator>>(istream& in, Tile& t);
+};
+
+// Clue: a small "delivery package" for one letter 
+
+struct Clue {
+    char clueLetter;     
+    int cluePosition;   
+    WordRow clueRow;     
+
+    Clue();                                          
+    Clue(char letter, int position, WordRow row);    
+};
+
+//  Location: ONE room or place in the cottage 
+struct Location {
+    string locName;     
+    char letterClueLoc;     
+    int boardPosLoc;         
+    WordRow locRow;         
+    bool locSearchFlag;    
+
+    Location();                                                  
+    Location(const string& name, char letter, int position);
+
+    friend ostream& operator<<(ostream& out, const Location& loc);
+    friend istream& operator>>(istream& in, Location& loc);
+};
+
+
+
+
+//  MODULE 5 : TileRack
+//  The rack holds the letters the detective has collected so far,like the little holder in real Scrabble.
+
+class TileRack {
+private:
+    Tile* tiles;        
+    int count;         
+    int maxTiles;      
+
+public:
+    TileRack(int maxSize = 8);                       
+    TileRack(const TileRack& other);                 
+    TileRack& operator=(const TileRack& other);    
+    ~TileRack();                                     
+
+    void addTile(char letter);       
+    void removeLetter(char letter);  
+    int getCount() const;           
+    int getMaxTiles() const;       
+    bool isFull() const;             
+    bool isEmpty() const;         
+    char getLetterAt(int index) const;   
+    void display() const;           
+
+    // MODULE 11 - Operator +
+    TileRack operator+(const TileRack& other) const;
+
+    friend ostream& operator<<(ostream& out, const TileRack& rack);
+};
+
+
 
 #endif 
