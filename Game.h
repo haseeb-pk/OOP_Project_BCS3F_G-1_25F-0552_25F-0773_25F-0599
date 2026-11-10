@@ -191,6 +191,172 @@ public:
 
 // Hannan Part :
 
+//  DETECTIVE  -  the player
 
+class Detective : public Character {
+private:
+    int credibility;            
+    int turns;                 
+    TileRack rackWord1;        
+    TileRack rackWord2;       
+    string solvedWords;   
+
+public:
+    Detective(const string& name = "Detective", int startingCredibility = 100);
+    virtual ~Detective();
+
+    virtual void display() const;            
+
+    int getCredibility() const;
+    int getTurns() const;
+    void setCredibility(int value);
+    void loseCredibility(int amount);           
+    void useTurn();                             
+
+    TileRack& getRack(WordRow row);                
+    const TileRack& getRack(WordRow row) const;
+    void collectClue(const Clue& clue);         
+
+    void addSolvedWord(const string& word);
+    string getSolvedWords() const;
+};
+
+
+
+//  VICTIM  -  the French business owner.
+
+class Victim : public Character {
+private:
+    WordRow clueRowChar;       
+    char letterClueChar;      
+    int boardPosChar;          
+    bool interviewed;         
+
+public:
+    Victim(const string& name, const string& nat, char letter, int position);
+    virtual ~Victim();
+
+    virtual void display() const;
+    virtual char getLetter() const;
+    virtual int getPosition() const;
+    virtual WordRow getRow() const;
+    virtual int getMinCredibility() const;      
+    virtual bool isInterviewed() const;
+    virtual void markInterviewed();
+};
+
+
+
+//  SUSPECT  -  parent of the seven suspects.
+
+class Suspect : public Character {
+protected:
+    char letterClueChar;        // the letter this suspect gives
+    int boardPosChar;           // where it goes (1 to 8)
+    WordRow clueRowChar;        // WORD_2
+    bool interviewed;           // already interviewed?
+    int minCredibility;         // credibility needed to interview
+
+public:
+    Suspect(const string& name, const string& role, const string& nat,
+            char letter, int position, int minCred);
+    virtual ~Suspect();
+
+    virtual char getLetter() const;
+    virtual int getPosition() const;
+    virtual WordRow getRow() const;
+    virtual int getMinCredibility() const;
+    virtual bool isInterviewed() const;
+    virtual void markInterviewed();
+};
+
+
+
+//  BUSINESS SIDE:  BusinessRelations -> Partner, PA
+
+class BusinessRelations : virtual public Suspect {
+public:
+    BusinessRelations(const string& name, const string& role,
+                      const string& nat, char letter, int position, int minCred);
+    virtual ~BusinessRelations();
+};
+
+// Partner 1 and Partner 2 (minimum credibility 50)
+class Partner : public BusinessRelations {
+private:
+    int partnerNumber;          
+public:
+    Partner(const string& name, const string& nat, char letter,
+            int position, int partnerNo);
+    virtual ~Partner();
+    virtual void display() const;
+    int getPartnerNumber() const;
+};
+
+
+
+//  CLOSE RELATIONS:  CloseRelations -> OwnersChild, PA
+
+class CloseRelations : virtual public Suspect {
+public:
+    CloseRelations(const string& name, const string& role,
+                   const string& nat, char letter, int position, int minCred);
+    virtual ~CloseRelations();
+};
+
+// The owner's teenage child (age 15 to 19, minimum credibility 75)
+class OwnersChild : public CloseRelations {
+private:
+    int age;
+public:
+    OwnersChild(const string& name, const string& nat, char letter,
+                int position, int childAge = 17);
+    virtual ~OwnersChild();
+    virtual void display() const;
+    int getAge() const;
+};
+
+
+
+//  PA  -  the owner's personal assistant (minimum credibility 35)
+
+class PA : public BusinessRelations, public CloseRelations {
+public:
+    PA(const string& name, const string& nat, char letter, int position);
+    virtual ~PA();
+    virtual void display() const;
+};
+
+
+
+//  HOUSE HELP  -  Cook, Guard, Servant (can be interviewed any time)
+
+class HouseHelp : public Suspect {
+public:
+    HouseHelp(const string& name, const string& role,
+              const string& nat, char letter, int position);
+    virtual ~HouseHelp();
+};
+
+class Cook : public HouseHelp {
+public:
+    Cook(const string& name, const string& nat, char letter, int position);
+    virtual ~Cook();
+    virtual void display() const;
+};
+
+class Guard : public HouseHelp {
+public:
+    Guard(const string& name, const string& nat, char letter, int position);
+    virtual ~Guard();
+    virtual void display() const;
+};
+
+class Servant : public HouseHelp {
+public:
+    Servant(const string& name, const string& nat, char letter, int position);
+    virtual ~Servant();
+    virtual void display() const;
+};
 
 #endif 
