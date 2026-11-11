@@ -184,7 +184,6 @@ public:
 };
 
 // Kaleem Part :
-
 //  MODULE 4 : Scrabble (the game board)
 //
 //  The board has TWO rows (a "jagged" array: rows of different length):
