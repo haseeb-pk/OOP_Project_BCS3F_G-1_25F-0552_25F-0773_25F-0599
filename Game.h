@@ -183,7 +183,6 @@ public:
     friend ostream& operator<<(ostream& out, const TileRack& rack);
 };
 
-// Kaleem Part :
 //  MODULE 4 : Scrabble (the game board)
 //
 //  The board has TWO rows (a "jagged" array: rows of different length):
@@ -302,9 +301,6 @@ public:
     friend istream& operator>>(istream& in, Character& c);   // reads name, role, nationality
 };
 
-
-
-// Hannan Part :
 
 //  DETECTIVE  -  the player
 
@@ -473,5 +469,124 @@ public:
     virtual ~Servant();
     virtual void display() const;
 };
+
+//  MODULE 6 : SCORE BOARD and RULES (working with text files)
+
+class ScoreBoard {
+private:
+    string fileName;      
+
+public:
+    ScoreBoard(const string& file = "leader/scoreBoard.txt");
+
+    void addScore(const string& detective, const string& result,
+                  int credibility, int turnsLeft, const string& culprit);
+
+
+    void displayAll() const;
+
+    static string todayDate();
+};
+
+struct GameRules {
+    int maxTurns;               
+    int startingCredibility;    
+    int wrongTurnPenalty;      
+    int wrongWordPenalty;      
+    string winCondition;
+    string loseCondition;
+
+    GameRules();                                     
+    bool loadFromFile(const string& fileName);  
+    void display() const;                            
+};
+
+//  MODULE 12 : GameEngine  
+//
+//  SINGLETON PATTERN: only ONE GameEngine can ever exist.
+//
+//  RELATIONSHIPS :
+//    Composition : GameEngine OWNS Detective, Cottage, Scrabble, TileRack
+//    Association : GameEngine USES ScoreBoard
+//    Dependency  : GameEngine uses GameException
+//    Friend      : GameEngine is a friend of Character
+class GameEngine {
+private:
+    static GameEngine* instance;    
+
+    //parts the engine OWNS (composition) 
+    GameState state;                  
+    GameRules rules;                  
+    Detective detective;             
+    Cottage cottage;                  
+    Scrabble scrabble;                
+    TileRack mergedRack;              
+
+    // part the engine only USES (association) 
+    ScoreBoard* scoreBoard;
+    static const int PEOPLE_COUNT = 8;
+    static const int SUSPECT_COUNT = 7;
+    Character* people[PEOPLE_COUNT]; 
+
+    int culpritIndex;                 
+    string culpritRole;          
+    string word1;                
+    string word2;               
+    bool word1Solved;                
+    bool word2Solved;                 
+
+  
+    GameEngine();                                 
+    GameEngine(const GameEngine&);                
+    GameEngine& operator=(const GameEngine&);     
+    ~GameEngine();                               
+
+   
+    void loadRules();                
+    void pickCulprit();               
+    void loadClueWords();            
+    void loadLocations();            
+    void loadCharacters();        
+    void clearCharacters();        
+    void resetGame(const string& detectiveName);   
+
+   
+    static void clearScreen();                  
+    static void pauseScreen();                 
+    static int readInt(int low, int high);     
+    static bool readYesNo(const string& prompt);  
+    static string readDetectiveName();     
+
+    //  menus (Module 13) 
+    void showMainMenu() const;
+    void showGameMenu() const;
+    void showStatus() const;       
+    void showAbout() const;          
+    void showRules() const;           
+
+   
+    void handleMainMenu();         
+    void handleGameTurn();          
+    void visitLocation();            
+    void interviewPerson();          
+    void viewBoard() const;          
+    void formWord();                 
+    void accuseSuspect();            
+    void quitGame();                 
+    void spendTurn();               
+
+    // end of the game (Module 14) 
+    void checkEndConditions();       
+    void finishGame();               
+
+public:
+    static GameEngine& getInstance();  
+    static void destroyInstance();     
+    void attachScoreBoard(ScoreBoard* board);  
+    void step();
+    void handleException(const GameException& e);
+    GameState getState() const;     
+};
+
 
 #endif 
